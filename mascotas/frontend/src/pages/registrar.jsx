@@ -6,7 +6,6 @@ import bgBack from '../assets/btn-back.svg';
 import bgClose from '../assets/btn-close.svg';
 import bgCamera from '../assets/photo-lg-0.svg';
 import bgSelect from '../assets/arrows.svg';
-import bgIconCamera from '../assets/icon-camera.svg';
 import btnSave from '../assets/btn-save.svg';
 import Swal from 'sweetalert2';
 

@@ -77,8 +77,9 @@ function Listar() {
                     return (
                         <div key={index} className="w-full p-4 rounded-3xl flex items-center bg-gray-300">
                             <div className="w-16 h-16 rounded-full overflow-hidden">
-                                <img src={imageUrl} alt={`Picture ${index + 1}`} className="w-full h-full object-cover ml-[-1px]" />
-                            </div>
+    <img src={`http://localhost:3000/img/${pet.foto}`} alt={`Picture ${index + 1}`} className="w-full h-full object-cover ml-[-1px]" />
+</div>
+
                             <div className="flex flex-grow items-center justify-between ml-4">
                                 <div>
                                     <h3 className='text-blue-800'>{pet.name}</h3>

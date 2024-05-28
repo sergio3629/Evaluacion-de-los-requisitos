@@ -10,42 +10,51 @@ import bgIconCamera from '../assets/icon-camera.svg';
 import btnUpdate from '../assets/btn-update.svg';
 
 function Actualizar() {
-  const { id_mascota } = useParams();
-  const [formData, setFormData] = useState({
-    name: '',
-    fk_id_raza: '',
-    fk_id_categoria: '',
-    fk_id_genero: '',
-    foto: '',   
-});
-  
-  const [raza, setRaza] = useState([]);
-  const [categoria, setCategoria] = useState([]);
-  const [genero, setGenero] = useState([]);
-  const [previewImage, setPreviewImage] = useState(null);
-  const token = localStorage.getItem('token');
+    const { id_mascota } = useParams();
+    const [formData, setFormData] = useState({
+        name: '',
+        fk_id_raza: '',
+        fk_id_categoria: '',
+        fk_id_genero: '',
+        foto: '',   
+        fotoName: '' // Agregar esta propiedad para almacenar el nombre de la imagen
+      });
+      
+    
+    const [raza, setRaza] = useState([]);
+    const [categoria, setCategoria] = useState([]);
+    const [genero, setGenero] = useState([]);
+    const [previewImage, setPreviewImage] = useState(null);
+    const [selectedImage, setSelectedImage] = useState(null);
 
-  useEffect(() => {
+    const token = localStorage.getItem('token');
+
+ useEffect(() => {
     const fetchMascota = async () => {
-      try {
-        const response = await axios.get(`http://localhost:3000/BuscarMascota/${id_mascota}`, {
-          headers: { token: token }
-        });
-        const { nombre, fk_id_raza, fk_id_categoria, foto, fk_id_genero } = response.data;
-        setFormData({
-          name: nombre || '',
-          fk_id_raza: fk_id_raza || '',
-          fk_id_categoria: fk_id_categoria || '',
-          foto: foto || '',
-          fk_id_genero: fk_id_genero || '',
-        });
-        setPreviewImage(`http://localhost:3000/img/${foto}`);
-      } catch (error) {
-        console.error('Error al obtener los datos de la mascota:', error);
-      }
+        try {
+            const response = await axios.get(`http://localhost:3000/BuscarMascota/${id_mascota}`, {
+                headers: { token: token }
+            });
+            const { name, fk_id_raza, fk_id_categoria, foto, fk_id_genero } = response.data[0];
+            setFormData({
+                name: name || '',
+                fk_id_raza: fk_id_raza || '',
+                fk_id_categoria: fk_id_categoria || '',
+                foto: foto || '',
+                fk_id_genero: fk_id_genero || '',
+                fotoName: foto || '' // Establecer el nombre de la imagen
+            });
+              
+            if (!formData.foto) {
+                setPreviewImage(`http://localhost:3000/img/${foto}`);
+                setSelectedImage(`http://localhost:3000/img/${foto}`);
+            }// Establecer la URL de la imagen seleccionada
+        } catch (error) {
+            console.error('Error al obtener los datos de la mascota:', error);
+        }
     };
     fetchMascota();
-  }, [id_mascota, token]);
+}, [id_mascota, token]);
   
 
     useEffect(() => {
@@ -69,23 +78,23 @@ function Actualizar() {
     const handleChange = e => {
         const { name, value } = e.target;
         setFormData(prevState => ({
-            ...prevState,
-            [name]: value
+          ...prevState,
+          [name]: value
         }));
-    };
+      };
 
-    const handleFileChange = (e) => {
+      const handleFileChange = (e) => {
         if (e.target.files.length > 0) {
-            const file = e.target.files[0];
-            setFormData(prevState => ({
-                ...prevState,
-                foto: file
-            }));
-            setPreviewImage(URL.createObjectURL(file)); // Establece la imagen de previsualización
+          const file = e.target.files[0];
+          setFormData(prevState => ({
+            ...prevState,
+            foto: file
+          }));
+          setSelectedImage(URL.createObjectURL(file)); // Actualizar la URL de la imagen seleccionada
         }
-    };
-
-    const handleSubmit = async (e) => {
+      };
+      
+      const handleSubmit = async (e) => {
         e.preventDefault();
 
         const formDataToSend = new FormData();
@@ -93,14 +102,19 @@ function Actualizar() {
         formDataToSend.append('fk_id_raza', formData.fk_id_raza);
         formDataToSend.append('fk_id_categoria', formData.fk_id_categoria);
         formDataToSend.append('fk_id_genero', formData.fk_id_genero);
+        
+        // Si se seleccionó una nueva imagen, agregarla al formDataToSend
         if (formData.foto instanceof File) {
             formDataToSend.append('foto', formData.foto);
+        } else {
+            // Conservar la imagen original si no se seleccionó una nueva
+            formDataToSend.append('foto', formData.fotoName);
         }
-
+        
         try {
             const response = await axios.put(`http://localhost:3000/ActualizarMascota/${id_mascota}`, formDataToSend, {
                 headers: {
-                    'token': token, // Añade el token en los encabezados
+                    'token': token,
                     'Content-Type': 'multipart/form-data'
                 }
             });
@@ -108,6 +122,7 @@ function Actualizar() {
         } catch (error) {
             console.error('Error actualizando mascota:', error);
         }
+        
     };
 
     return (
@@ -130,15 +145,21 @@ function Actualizar() {
                 </Link>
             </div>
 
-            {previewImage ? (
-                <img 
-                    src={previewImage} 
-                    alt="Mascota" 
-                    className="cursor-pointer -mt-8 w-32 h-32 object-cover rounded-full"
-                />
-            ) : (
-                <img src={bgPetCamera} alt="Camera" className="cursor-pointer -mt-8" />
-            )}
+            {selectedImage ? (
+  <img 
+    src={selectedImage} 
+    alt="Mascota" 
+    className="cursor-pointer -mt-8 w-32 h-32 object-cover rounded-full"
+  />
+) : previewImage ? (
+  <img 
+    src={previewImage} 
+    alt="Mascota" 
+    className="cursor-pointer -mt-8 w-32 h-32 object-cover rounded-full"
+  />
+) : (
+  <img src={bgPetCamera} alt="Camera" className="cursor-pointer -mt-8" />
+)}
 
             {/* Input para el nombre */}
             <input
@@ -193,17 +214,18 @@ function Actualizar() {
 
             {/* Input para subir la foto */}
             <div className="relative">
-                <label htmlFor="foto" className="bg-slate-400 px-3 py-2 rounded-3xl border-gray-300 bg-transparent focus:outline-none mt-4 placeholder-gray-500 cursor-pointer flex" style={{ width: '355px', backgroundColor: 'rgba(206, 206, 206, 0.8)', color: 'grey'}}>
-                    {formData.foto ? formData.foto.name : 'Subir Foto'}
-                    <input
-                        type='file' 
-                        id='foto'
-                        onChange={handleFileChange}
-                        name='foto'
-                        className="hidden"
-                        required
-                    />
-                </label>
+            <label htmlFor="foto" className="bg-slate-400 px-3 py-2 rounded-3xl border-gray-300 bg-transparent focus:outline-none mt-4 placeholder-gray-500 cursor-pointer flex" style={{ width: '355px', backgroundColor: 'rgba(206, 206, 206, 0.8)', color: 'grey'}}>
+  {formData.fotoName || 'Subir Foto'}
+  <input
+    type='file' 
+    id='foto'
+    onChange={handleFileChange}
+    name='foto'
+    className="hidden"
+    required
+  />
+</label>
+
                 <img src={bgIconCamera} alt="Icon Camera" className="absolute top-1/2 right-4 transform -translate-y-1/2 pointer-events-none" />
             </div>
 

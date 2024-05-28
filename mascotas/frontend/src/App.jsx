@@ -16,7 +16,6 @@ function App() {
         <Route path="/Listar" element={<Listar />} />
         <Route path="/Registrar" element={<Registrar />} />
         <Route path="/Actualizar/:id_mascota" element={<Actualizar />} />
-        {/* Ajusta la ruta para incluir el parámetro id_mascota */}
         <Route path="/Buscar/:id_mascota" element={<Buscar />} />
       </Routes>
     </BrowserRouter>
