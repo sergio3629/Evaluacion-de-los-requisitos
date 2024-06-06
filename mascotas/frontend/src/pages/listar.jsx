@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+
 import axios from 'axios';
 import bgBlue from '../assets/bg.svg';
 import bgClose from '../assets/btn-close.svg';

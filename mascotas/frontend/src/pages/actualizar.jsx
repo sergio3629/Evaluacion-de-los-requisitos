@@ -8,6 +8,8 @@ import bgPetCamera from '../assets/photo-lg-1.svg';
 import bgSelect from '../assets/arrows.svg';
 import bgIconCamera from '../assets/icon-camera.svg';
 import btnUpdate from '../assets/btn-update.svg';
+import Swal from 'sweetalert2';
+
 
 function Actualizar() {
     const { id_mascota } = useParams();
@@ -93,10 +95,9 @@ function Actualizar() {
           setSelectedImage(URL.createObjectURL(file)); // Actualizar la URL de la imagen seleccionada
         }
       };
-      
       const handleSubmit = async (e) => {
         e.preventDefault();
-
+    
         const formDataToSend = new FormData();
         formDataToSend.append('name', formData.name);
         formDataToSend.append('fk_id_raza', formData.fk_id_raza);
@@ -119,11 +120,20 @@ function Actualizar() {
                 }
             });
             console.log('Mascota actualizada con éxito:', response.data);
+    
+            // Mostrar alerta de éxito
+            Swal.fire({
+                icon: 'success',
+                title: 'Éxito',
+                text: 'Se ha modificado la mascota exitosamente.',
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'Ok'
+            });
         } catch (error) {
             console.error('Error actualizando mascota:', error);
         }
-        
     };
+    
 
     return (
         <div
